@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-// /api/categories
+// /api/v1/categories
 
 // middleware específico a este router sirve para tener un control de cuando se accede a un endpoint
 router.use('/', function (req, res, next) {

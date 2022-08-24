@@ -2,7 +2,7 @@ const express = require('express');
 const faker = require('faker');
 
 const router = express.Router();
-// /api/products
+// /api/v1/products
 
 // middleware específico a este router sirve para tener un control de cuando se accede a un endpoint
 // router.use('/', function (req, res, next) {
@@ -11,6 +11,7 @@ const router = express.Router();
 // })
 
 // define the home page de products
+// api/v1/products GET
 router.get('/', (req, res, next) => {
   const products = [];
   const { size } = req.query;
@@ -23,15 +24,42 @@ router.get('/', (req, res, next) => {
       image: faker.image.imageUrl(),
     });
   }
-  res.json(products);
+  res.status(201).json(products);
   next();
 });
 
-//este endpoint es estatico, por ende va antes del id dinamico
-router.get('/products/filter', (req, res) => {
-  res.send('filter');
+// api/v1/products POST
+router.post('/', (req, res, next) => {
+  const body = req.body;
+  res.status(204).json({
+    message: 'created',
+    data: body,
+  });
 });
 
+// api/v1/products/:id PATCH
+router.patch('/:id', (req, res, next) => {
+  const { id } = req.params;
+  const body = req.body;
+  res.json({
+    message: 'updated',
+    data: {
+      id,
+      data: body,
+    },
+  });
+});
+
+// api/v1/products/:id DELETE
+router.delete('/:id', (req, res, next) => {
+  const { id } = req.params;
+  res.json({
+    message: 'deleted',
+    id,
+  });
+});
+
+// api/v1/products/:id GET
 router.get('/products/:id', (req, res) => {
   const { id } = req.params;
   res.json({

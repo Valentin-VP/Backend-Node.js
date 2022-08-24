@@ -1,7 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
-// /api/users
+// /api/v1/users
 
 // define the home page users
 router.get('/', (req, res) => {

@@ -7,9 +7,8 @@ const port = 3000;
 
 // IMPORTANTE: Los endpoints especificos deben estar antes de los dinamicos
 
-// app.get('/', (req, res) => res.send('Hello World!'));
-
-// app.get('/new-route', (req, res) => res.send('new-route!'));
+//se usa este middleware para recibir información de tipo json
+app.use(express.json());
 
 routerApi(app);
 
