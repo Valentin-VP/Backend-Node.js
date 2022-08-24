@@ -1,8 +1,12 @@
 const express = require('express');
-const faker = require('faker');
+const { tr } = require('faker/lib/locales');
+const { restart } = require('nodemon');
 
-const router = express.Router();
+const ProductService = require('../services/productService');
+
 // /api/v1/products
+const router = express.Router();
+const productService = new ProductService();
 
 // middleware específico a este router sirve para tener un control de cuando se accede a un endpoint
 // router.use('/', function (req, res, next) {
@@ -12,66 +16,42 @@ const router = express.Router();
 
 // define the home page de products
 // api/v1/products GET
-router.get('/', (req, res, next) => {
-  const products = [];
-  const { size } = req.query;
-  const limit = size || 10;
-  for (let i = 0; i < limit; i++) {
-    products.push({
-      id: faker.datatype.number(),
-      name: faker.commerce.productName(),
-      price: parseInt(faker.commerce.price(), 10),
-      image: faker.image.imageUrl(),
-    });
-  }
-  res.status(201).json(products);
-  next();
+router.get('/', async (req, res) => {
+  const products = await productService.list();
+  res.status(200).json(products);
 });
 
 // api/v1/products POST
-router.post('/', (req, res, next) => {
+router.post('/', async (req, res) => {
   const body = req.body;
-  res.status(204).json({
-    message: 'created',
-    data: body,
-  });
+  const newProduct = await productService.create(body);
+  res.status(201).json(newProduct);
 });
 
 // api/v1/products/:id PATCH
-router.patch('/:id', (req, res, next) => {
-  const { id } = req.params;
-  const body = req.body;
-  res.json({
-    message: 'updated',
-    data: {
-      id,
-      data: body,
-    },
-  });
+router.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body;
+    const updatedProduct = await productService.update(id, body);
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // api/v1/products/:id DELETE
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
-  res.json({
-    message: 'deleted',
-    id,
-  });
+  const deletedProduct = await productService.delete(id);
+  res.status(200).json(deletedProduct);
 });
 
 // api/v1/products/:id GET
-router.get('/products/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
-  res.json({
-    product: {
-      id,
-      name: 'product 1',
-      price: '100',
-      description: 'description 1',
-      image:
-        'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png',
-    },
-  });
+  const product = await productService.find(id);
+  res.status(200).json(product);
 });
 
 module.exports = router;
