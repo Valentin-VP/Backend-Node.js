@@ -1,6 +1,4 @@
 const express = require('express');
-const { tr } = require('faker/lib/locales');
-const { restart } = require('nodemon');
 
 const ProductService = require('../services/productService');
 const validatorHandler = require('../middlewares/validatorHandler');
