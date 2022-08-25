@@ -36,6 +36,10 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+app.get('/', (req, res) => {
+  res.send('Hello World');
+});
+
 routerApi(app);
 
 //los middlewares de error se definen despues de los endpoints
