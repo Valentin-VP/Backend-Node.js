@@ -3,6 +3,8 @@ const { tr } = require('faker/lib/locales');
 const { restart } = require('nodemon');
 
 const ProductService = require('../services/productService');
+const validatorHandler = require('../middlewares/validatorHandler');
+const { createProductSchema, updateProductSchema, getProductSchema } = require('../schemas/productSchema');
 
 // /api/v1/products
 const router = express.Router();
@@ -22,36 +24,51 @@ router.get('/', async (req, res) => {
 });
 
 // api/v1/products POST
-router.post('/', async (req, res) => {
+router.post('/',
+validatorHandler(createProductSchema, 'body'),
+async (req, res) => {
   const body = req.body;
   const newProduct = await productService.create(body);
   res.status(201).json(newProduct);
 });
 
 // api/v1/products/:id PATCH
-router.patch('/:id', async (req, res) => {
+router.patch('/:id',
+validatorHandler(getProductSchema, 'params'),
+validatorHandler(updateProductSchema, 'body'),
+async (req, res, next) => {
   try {
     const { id } = req.params;
     const body = req.body;
     const updatedProduct = await productService.update(id, body);
     res.status(200).json(updatedProduct);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 });
 
 // api/v1/products/:id DELETE
-router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  const deletedProduct = await productService.delete(id);
-  res.status(200).json(deletedProduct);
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedProduct = await productService.delete(id);
+    res.status(200).json(deletedProduct);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // api/v1/products/:id GET
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  const product = await productService.find(id);
-  res.status(200).json(product);
+router.get('/:id',
+validatorHandler(getProductSchema, 'params'),
+async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const product = await productService.find(id);
+    res.status(200).json(product);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
