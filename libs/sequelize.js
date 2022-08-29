@@ -5,10 +5,10 @@ const  { setUpModels } = require('../db/models');
 
 const USER = encodeURIComponent(config.db.user);
 const PASSWORD = encodeURIComponent(config.db.password);
-const URI = `postgres://${USER}:${PASSWORD}@${config.db.host}:${config.db.port}/${config.db.database}`;
+const URI = `mysql://${USER}:${PASSWORD}@${config.db.host}:${config.db.port}/${config.db.database}`;
 
 const sequelize = new Sequelize(URI, {
-  dialect: 'postgres',
+  dialect: 'mysql',
   logging: true,
 });
 
