@@ -18,6 +18,11 @@ const UserSchema = {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  role: {
+    allowNull: false,
+    type: Sequelize.STRING,
+    defaultValue: 'customer',
+  },
   createdAt: {
     allowNull: false,
     type: Sequelize.DATE,
@@ -38,7 +43,7 @@ class User extends Model {
       modelName: 'User',
       timestamp: false,
       updatedAt: false,
-    }
+    };
   }
 }
 
