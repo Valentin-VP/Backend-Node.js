@@ -17,7 +17,7 @@ const productService = new ProductService();
 // define the home page de products
 // api/v1/products GET
 router.get('/', async (req, res) => {
-  const products = await productService.list();
+  const products = await productService.find();
   res.status(200).json(products);
 });
 
@@ -62,7 +62,7 @@ validatorHandler(getProductSchema, 'params'),
 async (req, res, next) => {
   try {
     const { id } = req.params;
-    const product = await productService.find(id);
+    const product = await productService.findOne(id);
     res.status(200).json(product);
   } catch (error) {
     next(error);
