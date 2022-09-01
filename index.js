@@ -1,6 +1,7 @@
 const express = require('express');
 const routerApi = require('./routes');
 const cors = require('cors');
+const { checkApiKey } = require('./middlewares/authHandler');
 
 const {
   logErrors,
@@ -39,6 +40,10 @@ app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
   res.send('Hello World');
+});
+
+app.get('/api-check', checkApiKey, (req, res) => {
+  res.send('api checkeada');
 });
 
 routerApi(app);

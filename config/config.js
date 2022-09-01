@@ -10,6 +10,7 @@ const config = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   },
+  apiKey: process.env.API_KEY,
 };
 
 module.exports = { config };
