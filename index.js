@@ -38,6 +38,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
+require('./utils/auth');
+
 app.get('/', (req, res) => {
   res.send('Hello World');
 });
