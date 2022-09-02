@@ -27,33 +27,48 @@ class AuthService {
       role: user.role,
     };
     const token = jwt.sign(payload, config.jwtSecret);
-    delete req.user.dataValues.password;
-    res.json({
+    delete user.dataValues.password;
+    // delete user.dataValues.recoveryToken;
+    return {
       user: user,
       token,
-    });
+    };
   }
 
   async sendRecovery(email) {
     const user = await service.findByEmail(email);
-    console.log('-------------------------------------------------');
-    console.log(user);
     if (!user) {
       throw boom.unauthorized();
     }
-    console.log('emailUser', config.email);
-    const payload = {sub: user.id};
-    const token = jwt.sign(payload, config.jwtSecret, {expiresIn: '15min'});
-    const link = `http://myfrontend.com/recovery?token=${token}`;
-    await service.update(user.id, {recoveryToken: token});
+    const payload = { sub: user.id };
+    const token = jwt.sign(payload, config.jwtSecret, { expiresIn: '15min' });
+    // const link = `http://myfrontend.com/recovery?token=${token}`;
+    const link = `token=${token}`;
+    await service.update(user.id, { recoveryToken: token });
     const mail = {
       from: config.smtpEmail, // sender address
       to: `${user.dataValues.email}`, // list of receivers
       subject: 'Recovery password email', // Subject line
       html: `<b>Go to this link => ${link} </b>`, // html body
-    }
+    };
     const rta = await this.sendMmail(mail);
     return rta;
+  }
+
+  async changePassword(token, newPassword) {
+    try {
+      const payload = jwt.verify(token, config.jwtSecret);
+      const user = await service.findOne(payload.sub);
+      if (user.recoveryToken !== token) {
+        throw boom.unauthorized();
+      }
+      console.log(newPassword);
+      const hash = await bcrypt.hash(newPassword, 10);
+      const rta = await service.update(user.id, { password: hash, recoveryToken: null });
+      return { message: 'password changed' };
+    } catch (error) {
+      throw boom.unauthorized();
+    }
   }
 
   async sendMmail(infoMail) {
@@ -62,12 +77,12 @@ class AuthService {
       secure: true, // true for 465, false for other ports
       port: 465,
       auth: {
-        user: `${ config.smtpEmail }`,
+        user: `${config.smtpEmail}`,
         pass: `${config.smtpPassword}`,
       },
     });
     await transporter.sendMail(infoMail);
-    return {message: 'mail sent'};
+    return { message: 'mail sent' };
   }
 }
 
